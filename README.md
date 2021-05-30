@@ -4,6 +4,6 @@ code by zhuangjuwei@163.com
 
 
 bash install.sh
-clock help
-clock 
+clock.sh help
+. clock.sh
 clock exit
