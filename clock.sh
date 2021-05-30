@@ -14,22 +14,16 @@ _clock(){
     local date="\e[7m%(%T)T\e[m"
 
 	echo $BASHPID >$clock  
-    [ ! -e $clock.fifo ] && mkfifo $clock.fifo
-    exec 3<>$clock.fifo
-    cols=$COLUMNS
-    line=$LINES
 	[ -r $clock ] || _exit "echo unknow error."
 	while true; do 
 		[ ! -d /proc/$PPID ] && rm -f $clock
 		[ ! -f $clock ] && { date="        "; unset cur; }
         if [ -n "$cols" ] ; then 
 		    printf "\e[s\e[1;$[COLUMNS-7]H         \e[u"
-            COLUMNS=$cols
-            LINES=$line
         fi
 		printf "\e[s\e[1;$[COLUMNS-7]H$date\e[u" $cur 
 		[ "$cur" != -1 ] && exit
-		read -u 3 -t 1 line cols 
+		read -t 1 </dev/zero
 	done  
 
 }
@@ -48,7 +42,7 @@ _exit() {
 clock=~/.clock.${SSH_TTY##*/}
 if [ ${#@} = 0 ]; then
 	if ! _clock_is_runing; then
-	  	_clock &
+	  	_clock&
 	else	
 		echo -e "Clock is already running in current tty.\n"
 	fi
